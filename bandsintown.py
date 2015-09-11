@@ -10,7 +10,7 @@ class Client(object):
     """
 
     def __init__(self, app_id):
-        self.app_id = "app_id=" + app_id
+        self.app_id = app_id
         self.artist_url = "http://api.bandsintown.com/artists/"
         self.search_url = "http://api.bandsintown.com/events/"
         self.venue_url = "http://api.bandsintown.com/venues/"
@@ -24,19 +24,18 @@ class Client(object):
             return "Need 'artist_name' or 'mbid'"
         if mbid:
             mbid = "mbid_" + mbid + "?"
-
-            response = requests.get(self.artist_url + mbid + self.app_id)
-            if response.raise_for_status():
-                return response.raise_for_status()
-            return Artist(response)
+            response = requests.get(self.artist_url + mbid, params={"app_id":self.app_id})
         else:
             artist_name += ".json?"
+            response = requests.get(self.artist_url + artist_name, params={"app_id":self.app_id})
 
-            response = requests.get(self.artist_url + artist_name + self.app_id)
-            if response.raise_for_status():
-                return response.raise_for_status()
-            else:
-                return Artist(response)
+        if response.raise_for_status():
+            return response.raise_for_status()
+
+        else:
+            json = response.json()
+            return Artist(json.get("name"), json.get("url"),
+                          json.get("mbid"), json.get("upcoming_events_count"))
 
 
     def get_artist_events(self, artist_name=None, mbid=None, date=None):
@@ -47,14 +46,12 @@ class Client(object):
         if not (artist_name or mbid):
             return "Need 'artist_name' or 'mbid'"
         if mbid:
-            get_string += self.artist_url + "mbid_" + mbid + "/events?" + self.app_id
+            get_string += self.artist_url + "mbid_" + mbid + "/events?"
         else:
-            get_string += self.artist_url + artist_name + "/events.json?" + self.app_id
+            get_string += self.artist_url + artist_name + "/events.json?"
 
-        if date:
-            get_string += "&date=" + date
+        response = requests.get(get_string, params={"date=":date, "app_id": self.app_id})
 
-        response = requests.get(get_string)
         if response.raise_for_status():
             return response.raise_for_status()
         else:
@@ -69,26 +66,17 @@ class Client(object):
         get_string = "" + self.search_url + "search?"
         if not (artists or location):
             return "Need at least 'artists' or 'location'"
+
         if len(artists) > 1:
             for item in artists:
                 get_string += "artists[]=" + item + "&"
+            get_string = get_string[:-1]
         else:
             get_string += "artists[]=" + artists[0] + "&"
 
-        if location:
-            get_string += "&location=" + location
-        if radius:
-            get_string += "&radius=" + str(radius)
-        if date:
-            get_string += "&date=" + date
-        if page:
-            get_string += "&page=" + str(page)
-        if per_page:
-            get_string += "&per_page=" + str(per_page)
-
-        get_string += "format=json&" + self.app_id
-
-        response = requests.get(get_string)
+        response = requests.get(get_string, params={"location":location, "radius":radius,
+                                                    "date":date, "page":page, "per_page":per_page,
+                                                    "format":"json", "app_id":self.app_id})
         if response.raise_for_status():
             return response.raise_for_status()
         else:
@@ -110,21 +98,10 @@ class Client(object):
         else:
             get_string += "artists[]=" + artists[0]
 
-        if location:
-            get_string += "&location=" + location
-        if radius:
-            get_string += "&radius=" + str(radius)
-        if date:
-            get_string += "&date=" + date
-        if only_recs:
-            get_string += "&only_recs" + only_recs
-        if page:
-            get_string += "&page=" + str(page)
-        if per_page:
-            get_string += "&per_page=" + str(per_page)
-        get_string += "format=json&" + self.app_id
-
-        response = requests.get(get_string)
+        response = requests.get(get_string, params={"location":location, "radius":radius,
+                                                    "date":date, "only_recs":only_recs,
+                                                    "page":page, "per_page":per_page,
+                                                    "format":"json", "app_id":self.app_id})
         if response.raise_for_status():
             return response.raise_for_status()
         else:
@@ -136,14 +113,9 @@ class Client(object):
             Search for events that are on sale soon
         """
         get_string = self.search_url + "on_sale_soon?"
-        if location:
-            get_string += "&location=" + location
-        if radius:
-            get_string += "&radius=" + str(radius)
 
-        get_string += "format=json&" + self.app_id
-
-        response = requests.get(get_string)
+        response = requests.get(get_string, params={"location":location, "radius":radius,
+                                                    "format":"json", "app_id":self.app_id})
         if response.raise_for_status():
             return response.raise_for_status()
         else:
@@ -154,9 +126,9 @@ class Client(object):
         """
             Search for daily events
         """
-        get_string = self.search_url + "daily?" + self.app_id
+        get_string = self.search_url + "daily?"
 
-        response = requests.get(get_string)
+        response = requests.get(get_string, params={"app_id":self.app_id})
         if response.raise_for_status():
             return response.raise_for_status()
         else:
@@ -167,9 +139,9 @@ class Client(object):
         """
             Search for events based on a venue
         """
-        get_string = self.venue_url + str(venue_id) + "/events?&format=json&" + self.app_id
+        get_string = self.venue_url + str(venue_id) + "/events?"
 
-        response = requests.get(get_string)
+        response = requests.get(get_string, params={"format":"json", "app_id":self.app_id})
         if response.raise_for_status():
             return response.raise_for_status()
         else:
@@ -185,17 +157,10 @@ class Client(object):
         for word in query.split():
             get_string += word + "+"
         get_string = get_string[:-1]
-        if location:
-            get_string += "&location=" + location
-        if radius:
-            get_string += "&radius=" + radius
-        if page:
-            get_string += "&page=" + page
-        if per_page:
-            get_string += "&per_page" + per_page
-        get_string += "&format=json&" + self.app_id
 
-        response = requests.get(get_string)
+        response = requests.get(get_string, params={"location":location, "radius":radius,
+                                                    "page":page, "per_page":per_page,
+                                                    "format":"json", "app_id":self.app_id})
         if response.raise_for_status():
             return response.raise_for_status()
         else:
@@ -207,11 +172,11 @@ class Artist(object):
         Artist class that contains information about an artist
     """
 
-    def __init__(self, data):
-        self.name = data.json()['name']
-        self.url = data.json()['url']
-        self.mbid = data.json()['mbid']
-        self.upcoming_events_count = data.json()['upcoming_events_count']
+    def __init__(self, name, url, mbid, upcoming_events_count):
+        self.name = name
+        self.url = url
+        self.mbid = mbid
+        self.upcoming_events_count = upcoming_events_count
 
 
 class Events(object):
@@ -221,10 +186,13 @@ class Events(object):
 
     def __init__(self, data, search_venue=None):
         self.events = data.json()
+        self.search_venue = True if search_venue else False
+        """
         if search_venue:
             self.search_venue = True
         else:
             self.search_venue = None
+        """
 
     def __iter__(self):
         if self.search_venue:
@@ -232,7 +200,10 @@ class Events(object):
                 yield EventInfoVenue(item)
         else:
             for item in self.events:
-                yield EventInfo(item)
+                yield EventInfo(item.get("id"), item.get("url"), item.get("datetime"),
+                                item.get("ticket_url"), item.get("artists"),
+                                item.get("venue"), item.get("status"),
+                                item.get("ticket_status"), item.get("on_sale_datetime"))
 
 
 class EventInfo(object):
@@ -242,50 +213,24 @@ class EventInfo(object):
         self.venue is an EventInfoVenue object
     """
 
-    def __init__(self, data):
-        self.id = data['id']
-        self.url = data['url']
-
-        if 'datetime' in data:
-            self.datetime = data['datetime']
-        else:
-            self.datetime = None
-
-        if 'ticket_url' in data:
-            self.ticket_url = data['ticket_url']
-        else:
-            self.ticket_url = None
-
-        if 'artists' in data:
-            self.artists = EventInfoArtists(data['artists'])
-        else:
-            self.artists = None
-
-        if 'venue' in data:
-            self.venue = EventInfoVenue(data['venue'])
-        else:
-            self.venue = None
-
-        if 'status' in data:
-            self.status = data['status']
-        else:
-            self.status = None
-
-        if 'ticket_status' in data:
-            self.ticket_status = data['ticket_status']
-        else:
-            self.ticket_status = None
-
-        if 'on_sale_datetime' in data:
-            self.on_sale_datetime = data['on_sale_datetime']
-        else:
-            self.on_sale_datetime = None
+    def __init__(self, event_id, url, datetime, ticket_url, artists, venue, status,
+                 ticket_status, on_sale_datetime):
+        self.id = event_id
+        self.url = url
+        self.datetime = datetime
+        self.ticket_url = ticket_url
+        self.artists = EventInfoArtists(artists)
+        self.venue = EventInfoVenue(venue)
+        self.status = status
+        self.ticket_status = ticket_status
+        self.on_sale_datetime = on_sale_datetime
 
 
 class EventInfoArtists(object):
     """
         EventInfoArtists class that contains information for an events artists.
         The values in this object are lists
+        'data' is list containing a dict of values
     """
 
     def __init__(self, data):
@@ -302,6 +247,7 @@ class EventInfoArtists(object):
 class EventInfoVenue(object):
     """
         Contains an Event's Venue information
+        'data' is a dict of values
     """
 
     def __init__(self, data):
@@ -313,3 +259,4 @@ class EventInfoVenue(object):
         self.url = data['url']
         self.id = data['id']
         self.longitude = data['longitude']
+
