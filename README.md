@@ -1,4 +1,4 @@
-# BandsInTownAPI
+# py-bandsintown
 Python wrapper for BandsInTown 1.0 API
 # Usage
 Import and create client  
@@ -105,7 +105,7 @@ Contains details about an event.
 |url|The BandsInTown url for the event|
 |datetime|datetime of the event expressed in ISO 8601 format with no timezone. YYYY-MM-DDThh:mm:ss|
 |ticket_url|The BandsInTown url to the framed ticket seller page|
-|artists| List of artists for the event|
+|artists_list| List of artists for the event|
 |venue| Venue object that contains information about the venue|
 |status| Event status (available only from daily event feed). Not always available|
 |ticket_status| Tickets available/unavailable for the event|

@@ -208,7 +208,7 @@ class EventInfo(object):
         self.url = url
         self.datetime = datetime
         self.ticket_url = ticket_url
-        self.artists = [artist for artist in artists]
+        self.artists_list = [Artist(artist.get("name"), artist.get("url"), artist.get("mbid"), artist.get("upcoming_events_count")) for artist in artists]
         self.venue = Venue(venue.get("city"), venue.get("name"), venue.get("latitude"),
                            venue.get("region"), venue.get("country"), venue.get("url"),
                            venue.get("event_id"), venue.get("longitude"))
