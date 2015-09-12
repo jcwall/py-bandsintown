@@ -72,9 +72,12 @@ class Client(object):
         else:
             get_string += "artists[]=" + artists[0] + "&"
 
-        response = requests.get(get_string, params={"location": location, "radius": radius,
-                                                    "date": date, "page": page, "per_page": per_page,
-                                                    "format": "json", "app_id": self.app_id})
+        response = requests.get(get_string, params={"location": location,
+                                                    "radius": radius,
+                                                    "date": date, "page": page,
+                                                    "per_page": per_page,
+                                                    "format": "json",
+                                                    "app_id": self.app_id})
         if response.raise_for_status():
             return response.raise_for_status()
         else:
@@ -208,7 +211,10 @@ class EventInfo(object):
         self.url = url
         self.datetime = datetime
         self.ticket_url = ticket_url
-        self.artists_list = [Artist(artist.get("name"), artist.get("url"), artist.get("mbid"), artist.get("upcoming_events_count")) for artist in artists]
+
+        self.artists_list = [Artist(artist.get("name"), artist.get("url"), artist.get("mbid"),
+                                    artist.get("upcoming_events_count")) for artist in artists]
+
         self.venue = Venue(venue.get("city"), venue.get("name"), venue.get("latitude"),
                            venue.get("region"), venue.get("country"), venue.get("url"),
                            venue.get("event_id"), venue.get("longitude"))

@@ -8,11 +8,11 @@ with open('requirements.txt') as req:
 with open('README.md') as readme:
     long_description = readme.read()
 
-setup(name='BandsInTown API Wrapper',
+setup(name='py-bandsintown',
       version='0.1.0',
-      description='Unofficial Python API Wrapper for BandsInTown',
+      description='Unofficial Python Wrapper for BandsInTown API 1.0',
       long_description=long_description,
-      url='https://github.com/papernotes/BandsInTownAPI',
+      url='https://github.com/papernotes/py-bandsintown',
       author='Jonathan (papernotes)',
       packages=find_packages(),
       license='MIT',
