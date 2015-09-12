@@ -1,5 +1,9 @@
 # py-bandsintown
-Python wrapper for BandsInTown 1.0 API
+Python wrapper for [BandsInTown 1.0 API](https://www.bandsintown.com/api/1.0/overview)
+# Installation
+```
+python setup.py install
+```
 # Usage
 Import and create client  
 ```
