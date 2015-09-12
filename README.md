@@ -2,6 +2,7 @@
 Python wrapper for [BandsInTown 1.0 API](https://www.bandsintown.com/api/1.0/overview)
 # Installation
 ```
+git clone https://github.com/papernotes/py-bandsintown.git
 python setup.py install
 ```
 # Usage
