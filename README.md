@@ -96,8 +96,8 @@ A Generator that yields ```EventInfo``` objects
 
 ## Class ```EventInfo```  
 Contains details about an event.  
-```self.artists``` is an EventInfoArtists object
-```self.venue``` is an EventInfoVenue object  
+```self.artists``` is a list of Artists
+```self.venue``` is an Venue object  
 
 |Property|Description|
 |:------|:----------|
@@ -105,23 +105,14 @@ Contains details about an event.
 |url|The BandsInTown url for the event|
 |datetime|datetime of the event expressed in ISO 8601 format with no timezone. YYYY-MM-DDThh:mm:ss|
 |ticket_url|The BandsInTown url to the framed ticket seller page|
-|artists| EventInfoArtists object that contains information about the event|
-|venue| EventInfoVenue object that contains information about the venue|
+|artists| List of artists for the event|
+|venue| Venue object that contains information about the venue|
 |status| Event status (available only from daily event feed). Not always available|
 |ticket_status| Tickets available/unavailable for the event|
 |on_sale_datetime|On sale datetime for event tickets expressed in ISO 8601 format with no timezone, or None|  
   
-## Class ```EventInfoArtists```
-Contains information for an event's artists.  
-The properties in this class are lists  
 
-Property|Description|
-|:------|:----------|
-|artist_names|List of artists names|
-|artist_mbids| List of artist MusicBrainz IDs|
-|artist_urls| List of BandsInTown urls for the artists|  
-
-## Class ```EventInfoVenue```  
+## Class ```Venue```  
 Contains information for an Event's Venue  
 
 Property|Description|
